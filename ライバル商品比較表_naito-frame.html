@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>キャンバスプリント比較表 naito-frame vs 当社</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Meiryo UI', 'Yu Gothic UI', sans-serif;
+    background: #f0f2f5;
+    color: #333;
+    padding: 24px;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  .page-title {
+    background: linear-gradient(135deg, #2F5496, #1a3a6e);
+    color: #fff;
+    padding: 24px 32px;
+    border-radius: 12px 12px 0 0;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    letter-spacing: 2px;
+    box-shadow: 0 4px 12px rgba(47,84,150,0.3);
+  }
+  .page-title small {
+    display: block;
+    font-size: 13px;
+    font-weight: normal;
+    margin-top: 6px;
+    opacity: 0.8;
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+  }
+  .comparison-table thead th {
+    padding: 14px 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+    vertical-align: middle;
+    border: 1px solid rgba(255,255,255,0.2);
+    white-space: pre-line;
+  }
+  .comparison-table thead th.col-item { background: #4a4a4a; color: #fff; width: 14%; }
+  .comparison-table thead th.col-rival { background: #c00000; color: #fff; width: 22%; }
+  .comparison-table thead th.col-ours { background: #2e75b6; color: #fff; width: 22%; }
+  .comparison-table thead th.col-analysis { background: #e8a000; color: #1a1a1a; width: 24%; }
+
+  .category-row td {
+    background: #d6dce4;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 10px 16px;
+    border: 1px solid #bcc3cd;
+    letter-spacing: 1px;
+  }
+
+  .comparison-table tbody td {
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.6;
+    border: 1px solid #e0e0e0;
+    vertical-align: top;
+    text-align: center;
+  }
+  .comparison-table tbody td:first-child {
+    font-weight: bold;
+    background: #f8f9fa;
+    text-align: left;
+  }
+  .comparison-table tbody td:last-child {
+    text-align: left;
+    font-size: 12.5px;
+  }
+
+  .good { background: #e2efda !important; }
+  .bad { background: #fce4ec !important; }
+  .neutral { background: #fff8e1 !important; }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-right: 4px;
+  }
+  .tag-good { background: #4caf50; color: #fff; }
+  .tag-bad { background: #e53935; color: #fff; }
+  .tag-note { background: #ff9800; color: #fff; }
+
+  .summary-section {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .summary-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
+  .summary-card.full-width { grid-column: 1 / -1; }
+  .summary-card-header {
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+  }
+  .summary-card-header.strength { background: linear-gradient(135deg, #43a047, #2e7d32); }
+  .summary-card-header.weakness { background: linear-gradient(135deg, #e53935, #b71c1c); }
+  .summary-card-header.action { background: linear-gradient(135deg, #f9a825, #f57f17); color: #1a1a1a; }
+  .summary-card-header.profile { background: linear-gradient(135deg, #546e7a, #37474f); }
+  .summary-card-body {
+    padding: 18px 24px;
+  }
+  .summary-card-body li {
+    margin-bottom: 10px;
+    line-height: 1.7;
+    font-size: 14px;
+  }
+  .summary-card-body li strong { color: #2F5496; }
+
+  .rival-profile {
+    margin-top: 24px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
+  .rival-profile-header {
+    background: linear-gradient(135deg, #c00000, #8b0000);
+    color: #fff;
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: bold;
+  }
+  .rival-profile-body {
+    padding: 18px 24px;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .legend {
+    margin-top: 24px;
+    display: flex;
+    gap: 20px;
+    font-size: 13px;
+    padding: 12px 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .legend-color {
+    width: 20px; height: 20px;
+    border-radius: 4px; border: 1px solid #ccc;
+  }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .summary-section { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- ライバルプロフィール -->
+  <div class="rival-profile">
+    <div class="rival-profile-header">ライバル情報：naito-frame（内藤額縁店）</div>
+    <div class="rival-profile-body">
+      <strong>商品URL：</strong><a href="https://item.rakuten.co.jp/naito-frame/canvasprint-f3/" target="_blank">https://item.rakuten.co.jp/naito-frame/canvasprint-f3/</a><br>
+      <strong>ショップ特徴：</strong>額縁専門店。キャンバスプリントは29サイズ展開（F0〜F50、S0〜S50、A判、B判）と圧倒的な品揃え。<br>
+      <strong>レビュー：</strong>4.85/5.0（683件）— 品質・仕上がりの評価が高い。<br>
+      <strong>価格帯：</strong>¥2,150〜¥55,020 — 小型から大型パネルまで幅広い。
+    </div>
+  </div>
+
+  <div style="height:24px;"></div>
+
+  <!-- 比較表 -->
+  <div class="page-title">
+    キャンバスプリント比較表：naito-frame（内藤額縁店） vs 当社（名入れ屋）
+    <small>作成日: 2026年3月4日</small>
+  </div>
+
+  <table class="comparison-table">
+    <thead>
+      <tr>
+        <th class="col-item">比較項目</th>
+        <th class="col-rival">ライバル<br>naito-frame<br>（内藤額縁店）</th>
+        <th class="col-ours">当社①<br>キャンバスプリント<br>全面印刷 (dtu301)</th>
+        <th class="col-ours">当社②<br>キャンバスプリント<br>(dtu300)</th>
+        <th class="col-analysis">マーケティング分析</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- 価格戦略 -->
+      <tr class="category-row"><td colspan="5">■ 価格戦略</td></tr>
+      <tr>
+        <td>最低価格</td>
+        <td>2,150円（F0サイズ）</td>
+        <td>1,980円</td>
+        <td>1,980円</td>
+        <td class="good"><span class="tag tag-good">優位</span>当社が170円安い。同価格帯の競合に対し、わずかだが価格優位あり。</td>
+      </tr>
+      <tr>
+        <td>価格帯上限</td>
+        <td>55,020円（B0サイズ）</td>
+        <td>3,080円</td>
+        <td>3,080円</td>
+        <td class="neutral"><span class="tag tag-note">注目</span>ライバルは大型パネル需要をカバー。当社は小型特化だが、高単価商品の展開余地あり。</td>
+      </tr>
+      <tr>
+        <td>価格訴求力</td>
+        <td>サイズ別の細かい価格設定<br>送料別のものもあり</td>
+        <td>送料込み価格<br>分かりやすい</td>
+        <td>送料込み価格<br>分かりやすい</td>
+        <td class="good"><span class="tag tag-good">優位</span>当社は「送料込み」の明朗会計。ライバルは送料別あり、最終価格が分かりにくい。</td>
+      </tr>
+
+      <!-- 商品力 -->
+      <tr class="category-row"><td colspan="5">■ 商品力</td></tr>
+      <tr>
+        <td>サイズ展開</td>
+        <td>29種<br>長方形16種（F0〜F50, A判, B判）<br>正方形13種（S0〜S50）</td>
+        <td class="bad">3種<br>S/M/L</td>
+        <td class="bad">3種<br>S/M/L</td>
+        <td class="bad"><span class="tag tag-bad">課題</span>圧倒的な差。ライバル29種 vs 当社3種。サイズ展開の拡充が最重要課題。</td>
+      </tr>
+      <tr>
+        <td>最大サイズ</td>
+        <td>B0（1030×1456mm）<br>大型パネル対応</td>
+        <td class="bad">L（20×26.6cm）</td>
+        <td class="bad">L（20×26.6cm）</td>
+        <td class="bad"><span class="tag tag-bad">課題</span>ライバルはB0まで対応。当社はA4程度が最大。法人・インテリア需要を取りこぼしている。</td>
+      </tr>
+      <tr>
+        <td>キャンバス厚み</td>
+        <td>約20mm</td>
+        <td>記載なし</td>
+        <td>記載なし</td>
+        <td class="neutral"><span class="tag tag-note">注目</span>ライバルは厚み20mmで存在感あり。当社もスペック明記で品質訴求すべき。</td>
+      </tr>
+      <tr>
+        <td>フレーム素材</td>
+        <td>木製フレーム<br>（額縁専門店の強み）</td>
+        <td>記載なし</td>
+        <td>記載なし</td>
+        <td class="bad"><span class="tag tag-bad">課題</span>額縁専門店のブランド力。フレーム品質を訴求されると厳しい。当社も素材の明示が必要。</td>
+      </tr>
+      <tr>
+        <td>付属品</td>
+        <td>なし</td>
+        <td class="good">ミニアクリルスタンド付</td>
+        <td class="good">ミニアクリルスタンド付</td>
+        <td class="good"><span class="tag tag-good">優位</span>アクリルスタンド付属は明確な差別化。壁掛け不要で卓上に飾れる利便性。</td>
+      </tr>
+      <tr>
+        <td>印刷方式</td>
+        <td>UV印刷<br>色褪せしにくい</td>
+        <td>UV加工<br>特殊プリント</td>
+        <td>UV特殊プリント加工<br>色褪せない</td>
+        <td>印刷方式は同等。大きな差別化要因にはならない。</td>
+      </tr>
+
+      <!-- 納期・配送 -->
+      <tr class="category-row"><td colspan="5">■ 納期・配送</td></tr>
+      <tr>
+        <td>納期</td>
+        <td>2〜5営業日<br>（サイズによる）</td>
+        <td class="good">当日発送<br>（12時まで注文）</td>
+        <td class="good">当日発送<br>（12時まで注文）</td>
+        <td class="good"><span class="tag tag-good">優位</span>当日発送は圧倒的な強み。急ぎのギフト需要、誕生日・記念日直前の注文に対応可能。</td>
+      </tr>
+      <tr>
+        <td>送料</td>
+        <td>サイズにより異なる<br>一部送料別</td>
+        <td class="good">無料（送料込み）</td>
+        <td class="good">無料（送料込み）</td>
+        <td class="good"><span class="tag tag-good">優位</span>当社は全品送料込み。ライバルは大型サイズで送料が加算され、実質価格が上がる。</td>
+      </tr>
+      <tr>
+        <td>保証</td>
+        <td>記載なし</td>
+        <td class="good">90日間保証<br>返品対応</td>
+        <td>記載なし</td>
+        <td class="good"><span class="tag tag-good">優位</span>90日保証は安心感の訴求に有効。全商品への展開を推奨。</td>
+      </tr>
+
+      <!-- カスタマイズ -->
+      <tr class="category-row"><td colspan="5">■ カスタマイズ・用途</td></tr>
+      <tr>
+        <td>デザインツール</td>
+        <td>写真データ持込対応<br>（ツール提供なし）</td>
+        <td class="good">スマホアプリで<br>レイアウト・プレビュー</td>
+        <td class="good">スマホアプリで<br>レイアウト設計</td>
+        <td class="good"><span class="tag tag-good">優位</span>当社はスマホで完結。ライバルはデータ持込のみでハードルが高い。「スマホで簡単」は強い訴求。</td>
+      </tr>
+      <tr>
+        <td>文字入れ・名入れ</td>
+        <td>記載なし</td>
+        <td class="good">文字入れ・名入れ対応</td>
+        <td class="good">テキスト・名入れ対応</td>
+        <td class="good"><span class="tag tag-good">優位</span>名入れ対応は「名入れ屋」の本領。ギフト需要で大きな差別化ポイント。</td>
+      </tr>
+      <tr>
+        <td>用途提案</td>
+        <td>記念写真・風景写真<br>アート作品の展示</td>
+        <td class="good">結婚祝い・出産祝い<br>記念日・ペット写真</td>
+        <td class="good">結婚祝い・出産祝い<br>記念日・ペット写真</td>
+        <td class="good"><span class="tag tag-good">優位</span>ライバルは「飾る」用途中心。当社は「贈る」用途が充実。ギフト市場を獲得しやすい。</td>
+      </tr>
+      <tr>
+        <td>想定顧客</td>
+        <td>写真愛好家<br>アート・インテリア層<br>法人（展示用）</td>
+        <td>ギフト購入層<br>記念日ニーズ<br>ペットオーナー</td>
+        <td>ギフト購入層<br>記念日ニーズ<br>ペットオーナー</td>
+        <td class="neutral"><span class="tag tag-note">注目</span>ターゲットが異なる。ライバルは「品質重視層」、当社は「ギフト・手軽さ重視層」。棲み分けが可能。</td>
+      </tr>
+
+      <!-- 信頼性・ブランド -->
+      <tr class="category-row"><td colspan="5">■ 信頼性・ブランド</td></tr>
+      <tr>
+        <td>レビュー評価</td>
+        <td>4.85 / 5.0</td>
+        <td class="bad">未確認</td>
+        <td class="bad">未確認</td>
+        <td class="bad"><span class="tag tag-bad">課題</span>ライバルは高評価。当社もレビュー獲得施策が急務。</td>
+      </tr>
+      <tr>
+        <td>レビュー件数</td>
+        <td>683件</td>
+        <td class="bad">未確認</td>
+        <td class="bad">未確認</td>
+        <td class="bad"><span class="tag tag-bad">課題</span>社会的証明で大きく劣後。購入後フォローメール等のレビュー獲得策が必要。</td>
+      </tr>
+      <tr>
+        <td>ブランド力</td>
+        <td>額縁専門店<br>（品質・専門性の訴求）</td>
+        <td>名入れ屋<br>（名入れ・ギフト専門）</td>
+        <td>名入れ屋<br>（名入れ・ギフト専門）</td>
+        <td class="neutral"><span class="tag tag-note">注目</span>ライバルは「額縁のプロ」、当社は「名入れのプロ」。専門性の方向が異なり、直接競合を避けられる。</td>
+      </tr>
+      <tr>
+        <td>商品ジャンルの幅</td>
+        <td>額縁・フレーム全般<br>キャンバスはその一部</td>
+        <td>名入れギフト全般<br>キャンバスはその一部</td>
+        <td>名入れギフト全般<br>キャンバスはその一部</td>
+        <td>双方ともキャンバスプリントは商品群の一部。本業の専門性を活かした訴求が鍵。</td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <!-- サマリー -->
+  <div class="summary-section">
+
+    <div class="summary-card">
+      <div class="summary-card-header strength">当社の強み（naito-frameに対して）</div>
+      <div class="summary-card-body">
+        <ol>
+          <li><strong>当日発送</strong> → ライバルは2〜5営業日。急ぎのギフトで圧勝</li>
+          <li><strong>送料込み明朗会計</strong> → ライバルは送料別あり、最終価格が不透明</li>
+          <li><strong>最低価格が安い</strong> → 1,980円 vs 2,150円で170円の優位</li>
+          <li><strong>アクリルスタンド付属</strong> → 壁掛け不要で手軽に飾れる</li>
+          <li><strong>スマホでデザイン完結</strong> → ライバルはデータ持込のみ</li>
+          <li><strong>名入れ・文字入れ対応</strong> → ギフトの付加価値</li>
+          <li><strong>ギフト用途の訴求</strong> → 結婚・出産・記念日の提案が充実</li>
+          <li><strong>90日保証</strong> → 安心感の訴求で差別化</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-card-header weakness">当社の課題（naito-frameに対して）</div>
+      <div class="summary-card-body">
+        <ol>
+          <li><strong>サイズ展開の圧倒的な差</strong> → 29種 vs 3種。大型パネル需要を取りこぼし</li>
+          <li><strong>レビュー数の不足</strong> → 683件の実績に対し当社は未確認</li>
+          <li><strong>フレーム品質の訴求不足</strong> → 額縁専門店の「木製フレーム」に対抗できる情報がない</li>
+          <li><strong>スペック明記の不足</strong> → 厚み・素材の詳細が不足し品質比較ができない</li>
+          <li><strong>法人・大型ニーズ未対応</strong> → 展示・インテリア用の大型パネル市場を逃している</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="summary-card full-width">
+      <div class="summary-card-header action">推奨アクション（対 naito-frame 戦略）</div>
+      <div class="summary-card-body">
+        <ol>
+          <li><strong>ポジショニングの明確化</strong> →「品質・サイズのnaito-frame」vs「スピード・ギフト・手軽さの名入れ屋」として棲み分ける</li>
+          <li><strong>「当日届くギフト」を最大のUSPに</strong> → 誕生日・記念日の駆け込み需要を狙う。「今日注文、明日届く」の訴求を強化</li>
+          <li><strong>商品ページのスペック充実</strong> → 厚み・素材・重量を明記し、品質面の不安を解消</li>
+          <li><strong>中型サイズの追加</strong> → A3〜A2サイズを追加し、インテリア需要の一部を取り込む</li>
+          <li><strong>レビュー獲得キャンペーン</strong> → 購入後フォローメール・レビュー投稿でクーポン進呈等</li>
+          <li><strong>「スマホで3分、名入れギフト」</strong> → 手軽さ×ギフト×スピードを組み合わせたキャッチコピーで差別化</li>
+          <li><strong>セット割引の導入</strong> → 2枚・3枚セットで客単価を上げ、naito-frameの高単価商品に対抗</li>
+        </ol>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 凡例 -->
+  <div class="legend">
+    <span style="font-weight:bold;">凡例：</span>
+    <div class="legend-item">
+      <div class="legend-color" style="background:#e2efda;"></div>
+      <span>当社優位</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background:#fce4ec;"></div>
+      <span>当社課題</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color" style="background:#fff8e1;"></div>
+      <span>要注目（棲み分け可能）</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
