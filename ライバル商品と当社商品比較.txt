@@ -1,0 +1,10 @@
+ライバル商品と当社商品の詳細を比較してください。
+その上で、比較表をエクセルで作成してください。
+
+# ライバル商品
+https://item.rakuten.co.jp/izumidaishi/canvas1000/
+https://item.rakuten.co.jp/izumidaishi/rectangle1000/
+
+# 当社商品
+https://item.rakuten.co.jp/naireya-bekkan/dtu301-can/
+https://item.rakuten.co.jp/naireya-bekkan/dtu300-can/
